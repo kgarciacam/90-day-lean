@@ -81,6 +81,18 @@
     </div>
     <button class="btn" id="addFood" style="margin-top:10px">+ Añadir a hoy</button>
   </div>
+  <div class="card">
+    <h3>➕ Alimento manual</h3>
+    <p class="muted" style="margin-top:4px">Para cualquier cosa que no esté en tu lista: galleta, restaurante, postre, etc. No necesitas otra app.</p>
+    <label>Nombre del alimento<input id="manualName" type="text" placeholder="Ej.: Galleta de chocolate"></label>
+    <div class="two">
+      <label>kcal<input id="manualK" type="number" min="0" placeholder="150"></label>
+      <label>Proteína (g)<input id="manualP" type="number" min="0" step=".1" placeholder="2"></label>
+      <label>Carbos (g)<input id="manualC" type="number" min="0" step=".1" placeholder="20"></label>
+      <label>Grasa (g)<input id="manualF" type="number" min="0" step=".1" placeholder="7"></label>
+    </div>
+    <button class="btn" id="addManual" style="margin-top:10px">+ Añadir manualmente</button>
+  </div>
   <div id="tripFood" class="card hide">
     <h3>🇪🇺 Modo viaje</h3><p class="muted" style="margin-top:4px">No perseguimos calorías. Puedes registrar simplemente qué comiste.</p>
     <input id="travelMeal" placeholder="Ej.: paella + ensalada + fruta">
@@ -133,7 +145,7 @@ const foods=[
 ['Manzana','1 mediana',95,.5,25,.3],['Papaya','1 taza',55,.9,14,.2],['Frutos secos','28 g',170,5,7,15],
 ['Granuts de arándanos','30 g',150,1,24,5],['Soda Field','32 g',129,3,22,4],['Soda San Jorge','40 g',175,3,30,5],
 ['Hey Fit','1 porción · estimado',100,3,14,4],['Chai latte de soya Starbucks','1 pequeño · estimado',160,5,30,2.5],
-['Queso Edam','20 g',70,5,.3,5.5],['Manzana Israel','1 mediana',80,.4,21,.2],['Plátano de seda','1 mediano',90,1.1,23,.3],
+['Queso Edam','20 g',70,5,.3,5.5],['Manzana Israel','1 mediana',80,.4,21,.2],['Rapidita','1 unidad · aprox. 40 g',120,3,22,2],['Plátano de seda','1 mediano',90,1.1,23,.3],
 ['Tilapia a la plancha','100 g',130,26,0,2.5],['Popcorn Cineplanet','1 porción · estimado',500,8,55,28],
 ['Makis langostino empanizado + palta','8 piezas · estimado',450,18,48,20]
 ];
@@ -173,6 +185,13 @@ function renderWeek(){
 foods.forEach((f,i)=>$('#foodSelect').insertAdjacentHTML('beforeend',`<option value="${i}">${f[0]} · ${f[1]} · ${f[2]} kcal</option>`));
 $('#foodSelect').addEventListener('change',e=>{let f=foods[+e.target.value];if(f){$('#fk').value=f[2];$('#fp').value=f[3];$('#fc').value=f[4];$('#ff').value=f[5]}});
 $('#addFood').addEventListener('click',()=>{let i=+$('#foodSelect').value;if(!foods[i])return;let x=day();x.foods.push({n:foods[i][0],k:+$('#fk').value||0,p:+$('#fp').value||0,c:+$('#fc').value||0,f:+$('#ff').value||0});$('#foodSelect').value='';render()});
+$('#addManual').addEventListener('click',()=>{
+  let n=$('#manualName').value.trim(),k=+$('#manualK').value||0,p=+$('#manualP').value||0,c=+$('#manualC').value||0,f=+$('#manualF').value||0;
+  if(!n || k<=0)return;
+  day().foods.push({n:n+' · manual',k:k,p:p,c:c,f:f});
+  $('#manualName').value='';$('#manualK').value='';$('#manualP').value='';$('#manualC').value='';$('#manualF').value='';
+  render();
+});
 $('#addTravel').addEventListener('click',()=>{let v=$('#travelMeal').value.trim();if(!v)return;day().travelMeals.push(v);$('#travelMeal').value='';render()});
 $('#steps').addEventListener('input',e=>{day().steps=Math.max(0,+e.target.value||0);render()});
 $('#weight').addEventListener('input',e=>{day().weight=e.target.value;save()});
