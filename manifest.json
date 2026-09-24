@@ -1,0 +1,10 @@
+{
+  "name":"90 Day Lean",
+  "short_name":"90 Day Lean",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#f7f5f2",
+  "theme_color":"#7b6aa8",
+  "lang":"es",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

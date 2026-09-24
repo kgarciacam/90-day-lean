@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#7b6aa8">
+  <meta name="description" content="90 Day Lean - seguimiento personal de 90 días">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg">
+  <title>90 Day Lean</title>
+  <style>
+    :root{--bg:#f7f5f2;--card:#fff;--text:#292724;--muted:#77736d;--line:#e4e0da;--accent:#7b6aa8;--soft:#eeeaf7;--good:#4e7c62;--danger:#a55b5b}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select{font:inherit}button{cursor:pointer}.app{max-width:760px;margin:auto;padding:16px 14px 40px}
+    header{padding:8px 2px 14px}.brand{font-size:12px;color:var(--muted);letter-spacing:.12em}.title{font-size:25px;font-weight:750;margin-top:2px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0}
+    .top{background:linear-gradient(135deg,#faf8fd,#fff);}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.wrap{flex-wrap:wrap}
+    .phase{font-size:13px;font-weight:700;color:var(--accent)}h2,h3,p{margin:0}h3{font-size:17px}.muted{color:var(--muted);font-size:13px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}.stat{padding:10px;border:1px solid var(--line);border-radius:13px}.stat b{font-size:18px}.stat span{display:block;color:var(--muted);font-size:11px}
+    .bar{height:9px;background:#e9e6e1;border-radius:99px;overflow:hidden}.fill{height:100%;background:var(--accent);border-radius:99px}
+    .tabs{display:flex;gap:7px;overflow:auto;padding:4px 0 8px;position:sticky;top:0;background:var(--bg);z-index:3}.tab{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 13px;white-space:nowrap}.tab.active{background:var(--soft);border-color:#d8d0ea}
+    .panel{display:none}.panel.active{display:block}.grid{display:grid;gap:10px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    label{font-size:13px;color:var(--muted)}input,select{width:100%;margin-top:5px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:11px;color:var(--text);min-height:44px}
+    .btn{border:0;border-radius:12px;background:var(--soft);color:var(--text);padding:11px 14px;font-weight:650}.btn.secondary{background:#fff;border:1px solid var(--line)}.btn.danger{background:#f7eaea;color:var(--danger)}
+    .habit{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:13px}.habit input{width:20px;min-height:20px;margin:0}
+    .item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:13px}.pill{font-size:11px;background:var(--soft);padding:4px 7px;border-radius:99px}
+    .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.calday{min-height:58px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px;font-size:11px}.calday.selected{outline:2px solid var(--accent)}.calday.done{background:#f1eef8}.calday .n{font-weight:700}
+    .notice{background:var(--soft);border:1px solid #ded6ef;border-radius:14px;padding:12px;font-size:13px}.hide{display:none!important}
+    ul{margin:8px 0 0;padding-left:20px}.routine{border:1px solid var(--line);border-radius:14px;padding:13px}
+    @media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.app{padding-left:10px;padding-right:10px}}
+  </style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand">90 DAY LEAN</div><div class="title">Tu seguimiento 💜</div></header>
+
+<section class="card top">
+  <div class="row wrap">
+    <div><div id="phase" class="phase"></div><h2 id="dateTitle"></h2><div id="dayNo" class="muted"></div></div>
+    <div style="text-align:right"><b id="pct" style="font-size:27px">0%</b><div class="muted">del día</div></div>
+  </div>
+  <div class="bar" style="margin-top:14px"><div id="dayBar" class="fill" style="width:0%"></div></div>
+  <div class="stats">
+    <div class="stat"><span>Calorías</span><b id="kcal">0</b><span id="kcalGoal">/ 1650</span></div>
+    <div class="stat"><span>Proteína</span><b id="protein">0</b><span id="proteinGoal">/ 120 g</span></div>
+    <div class="stat"><span>Pasos</span><b id="stepsTop">0</b><span id="stepsGoal">/ 7K+</span></div>
+    <div class="stat"><span>Ejercicio</span><b id="minutes">0</b><span>min</span></div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="row">
+    <button class="btn secondary" id="prev">‹</button>
+    <label style="flex:1">Fecha<input id="date" type="date"></label>
+    <button class="btn secondary" id="next">›</button>
+  </div>
+  <div id="notice" class="notice" style="margin-top:10px"></div>
+</section>
+
+<nav class="tabs">
+  <button class="tab active" data-panel="home">Hoy</button>
+  <button class="tab" data-panel="food">Comidas</button>
+  <button class="tab" data-panel="exercise">Ejercicio</button>
+  <button class="tab" data-panel="week">Semana</button>
+  <button class="tab" data-panel="plan">Plan</button>
+</nav>
+
+<main>
+<section id="home" class="panel active">
+  <div class="card"><div class="row"><h3>Hábitos</h3><span class="muted" id="habitCount"></span></div><div id="habits" class="grid" style="margin-top:10px"></div></div>
+  <div class="card"><h3>Peso</h3><div class="two" style="margin-top:10px"><label>Peso (kg)<input id="weight" type="number" step=".1" min="30" max="200" placeholder="65.0"></label><label style="display:flex;align-items:end;gap:8px;padding-bottom:10px"><input id="period" type="checkbox" style="width:20px;min-height:20px;margin:0"> Regla / recuperación</label></div><p class="muted" style="margin-top:8px">En viaje no necesitas pesarte.</p></div>
+</section>
+
+<section id="food" class="panel">
+  <div id="normalFood" class="card">
+    <h3>Añadir alimento</h3>
+    <select id="foodSelect"><option value="">Selecciona un alimento…</option></select>
+    <div class="two">
+      <label>kcal<input id="fk" type="number"></label><label>Proteína (g)<input id="fp" type="number"></label>
+      <label>Carbos (g)<input id="fc" type="number"></label><label>Grasa (g)<input id="ff" type="number"></label>
+    </div>
+    <button class="btn" id="addFood" style="margin-top:10px">+ Añadir a hoy</button>
+  </div>
+  <div id="tripFood" class="card hide">
+    <h3>🇪🇺 Modo viaje</h3><p class="muted" style="margin-top:4px">No perseguimos calorías. Puedes registrar simplemente qué comiste.</p>
+    <input id="travelMeal" placeholder="Ej.: paella + ensalada + fruta">
+    <button class="btn" id="addTravel" style="margin-top:8px">+ Registrar comida</button>
+  </div>
+  <div class="card"><div class="row"><h3>Registrado</h3><span id="foodCount" class="muted"></span></div><div id="foodList" class="grid" style="margin-top:10px"></div><div id="travelList" class="grid" style="margin-top:10px"></div></div>
+</section>
+
+<section id="exercise" class="panel">
+  <div class="card">
+    <h3>Movimiento</h3>
+    <div class="two" style="margin-top:10px"><label>Pasos del día<input id="steps" type="number" min="0" max="50000"></label><div class="notice"><b id="moveGoal">7,000–10,000 pasos</b><br><span id="moveNote" class="muted">incluye corrida + caminata inclinada</span></div></div>
+    <div id="exerciseForm" style="margin-top:12px">
+      <h3 style="font-size:15px">Registrar ejercicio</h3>
+      <select id="etype"><option value="run">🏃 Running</option><option value="lower">🦵 Tren inferior</option><option value="upper">💪 Tren superior</option><option value="incline">🚶 Caminata inclinada</option><option value="mobility">🧘 Movilidad / recuperación</option></select>
+      <div id="runFields" class="two"><label>Distancia (km)<input id="runKm" type="number" min="0" step=".1" placeholder="Ej. 3.5"></label><label>Tiempo (min)<input id="runMin" type="number" min="0" step=".1" placeholder="Ej. 24"></label></div>
+      <div id="genericMinutes"><label>Tiempo (min)<input id="genericMin" type="number" min="1" step="1" value="30"></label></div>
+      <button class="btn" id="addExercise" style="margin-top:8px">+ Registrar ejercicio</button>
+    </div>
+    <div id="tripMovement" class="notice hide" style="margin-top:12px"><b>🇪🇺 Viaje</b><br>Los pasos son tu actividad principal. Gym y running son opcionales.</div>
+  </div>
+  <div id="routines" class="card">
+    <h3>Tus rutinas</h3>
+    <div class="grid" style="margin-top:10px">
+      <div class="routine"><b>🦵 Tren inferior</b><ul><li>Prensa/sentadilla · 3×8–12</li><li>Peso muerto rumano · 3×8–12</li><li>Hip thrust · 3×8–12</li><li>Curl femoral · 3×10–15</li><li>Extensión de cuádriceps · 2×10–15</li><li>Caminata inclinada · 15–20 min</li></ul></div>
+      <div class="routine"><b>💪 Tren superior</b><ul><li>Jalón al pecho · 3×8–12</li><li>Remo sentado · 3×8–12</li><li>Press de pecho · 3×8–12</li><li>Press de hombros · 2–3×8–12</li><li>Elevaciones laterales · 2–3×12–15</li><li>Curl de bíceps · 2×10–15</li><li>Tríceps en polea · 2×10–15</li><li><b>Extensiones de espalda · 2×10–15</b></li><li><b>Core · 2–3 series</b></li><li>Caminata inclinada · 20–30 min</li></ul></div>
+    </div>
+  </div>
+  <div class="card"><h3>Ejercicio registrado</h3><div id="exerciseList" class="grid" style="margin-top:10px"></div></div>
+</section>
+
+<section id="week" class="panel">
+  <div class="card"><h3>Progreso semanal</h3><p id="weekText" class="muted" style="margin-top:4px"></p><div class="row" style="margin-top:14px"><span>Objetivos</span><b id="weekPct">0%</b></div><div class="bar" style="margin-top:6px"><div id="weekBar" class="fill" style="width:0%"></div></div><div id="weekDays" class="calendar" style="margin-top:14px"></div></div>
+</section>
+
+<section id="plan" class="panel">
+  <div class="card"><h3>Tu calendario de 90 días</h3><div class="grid" style="margin-top:10px">
+    <div class="notice"><b>🇵🇪 24 sep – 23 oct</b><br><span class="muted">1,650 kcal · 120 g proteína · 2 gym · running · 7–10K pasos</span></div>
+    <div class="notice"><b>🇪🇺 24 oct – 15 nov</b><br><span class="muted">≥10K pasos · alimentación razonable · disfrutar · sin gym obligatorio</span></div>
+    <div class="notice"><b>🇵🇪 16 nov – 22 dic</b><br><span class="muted">Retomamos el plan normal sin compensar el viaje</span></div>
+  </div></div>
+  <div class="card"><h3>Regla de calorías</h3><p class="muted" style="margin-top:7px">1,650 kcal es el punto de partida y no baja automáticamente. Se revisa tras varias semanas según tendencia de peso, hambre, energía y rendimiento.</p></div>
+  <div class="card"><button class="btn danger" id="clear">Borrar todos mis datos</button><p class="muted" style="margin-top:7px">Solo úsalo si quieres reiniciar completamente la app en este dispositivo.</p></div>
+</section>
+</main>
+</div>
+<script>
+const START='2026-09-24',TRIPSTART='2026-10-24',TRIPEND='2026-11-15',END='2026-12-22';
+const foods=[
+['Manzana','1 mediana',95,.5,25,.3],['Papaya','1 taza',55,.9,14,.2],['Frutos secos','28 g',170,5,7,15],
+['Granuts de arándanos','30 g',150,1,24,5],['Soda Field','32 g',129,3,22,4],['Soda San Jorge','40 g',175,3,30,5],
+['Hey Fit','1 porción · estimado',100,3,14,4],['Chai latte de soya Starbucks','1 pequeño · estimado',160,5,30,2.5],
+['Queso Edam','20 g',70,5,.3,5.5],['Manzana Israel','1 mediana',80,.4,21,.2],['Plátano de seda','1 mediano',90,1.1,23,.3],
+['Tilapia a la plancha','100 g',130,26,0,2.5],['Popcorn Cineplanet','1 porción · estimado',500,8,55,28],
+['Makis langostino empanizado + palta','8 piezas · estimado',450,18,48,20]
+];
+let selected=START;
+let data=JSON.parse(localStorage.getItem('90daylean-data')||'{}');
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+function day(){if(!data[selected])data[selected]={foods:[],ex:[],steps:0,weight:'',period:false,hab:{protein:false,movement:false,training:false,recovery:false},travelMeals:[]};return data[selected]}
+function save(){localStorage.setItem('90daylean-data',JSON.stringify(data))}
+function phase(){return selected>=TRIPSTART&&selected<=TRIPEND?'trip':'normal'}
+function fmt(s){return new Intl.DateTimeFormat('es-PE',{day:'numeric',month:'short',year:'numeric'}).format(new Date(s+'T12:00:00'))}
+function dayDiff(a,b){return Math.round((new Date(a+'T12:00:00')-new Date(b+'T12:00:00'))/86400000)}
+function clamp(s){return s<START?START:s>END?END:s}
+function addDays(s,n){let d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function render(){
+ const x=day(),p=phase(),k=x.foods.reduce((a,z)=>a+z.k,0),pr=x.foods.reduce((a,z)=>a+z.p,0),mins=x.ex.reduce((a,z)=>a+z.m,0);
+ $('#phase').textContent=p==='trip'?'🇪🇺 MODO VIAJE':'🇵🇪 FASE NORMAL'; $('#dateTitle').textContent=fmt(selected); $('#dayNo').textContent=`Día ${dayDiff(selected,START)+1} de 90`;
+ $('#kcal').textContent=Math.round(k);$('#protein').textContent=Math.round(pr);$('#stepsTop').textContent=x.steps.toLocaleString('en-US');$('#minutes').textContent=mins;
+ $('#kcalGoal').textContent=p==='trip'?'':'/ 1650';$('#proteinGoal').textContent=p==='trip'?'':'/ 120 g';$('#stepsGoal').textContent=p==='trip'?'/ 10K+':'/ 7K+';
+ $('#date').value=selected;$('#weight').value=x.weight;$('#period').checked=x.period;$('#steps').value=x.steps;
+ $('#notice').innerHTML=p==='trip'?'<b>🇪🇺 Estás de viaje.</b> Prioridad: caminar, comer razonablemente, hidratarte y disfrutar. No necesitas contar calorías ni hacer gym.':'<b>🇵🇪 Plan normal.</b> Objetivo: 1,650 kcal · 120 g proteína · 7–10K pasos totales.';
+ $('#normalFood').classList.toggle('hide',p==='trip');$('#tripFood').classList.toggle('hide',p!=='trip');$('#exerciseForm').classList.toggle('hide',p==='trip');$('#tripMovement').classList.toggle('hide',p!=='trip');$('#routines').classList.toggle('hide',p==='trip');
+ $('#moveGoal').textContent=p==='trip'?'10,000+ pasos':'7,000–10,000 pasos';$('#moveNote').textContent=p==='trip'?'principal actividad del viaje':'incluye corrida + caminata inclinada';
+ let hs=p==='trip'?['movement','recovery']:['protein','movement','training','recovery'];let labels={protein:['Proteína','Llegué cerca de 120 g'],movement:['Movimiento','Cumplí mi objetivo de pasos'],training:['Entrenamiento','Hice lo que correspondía'],recovery:['Recuperación','Cuidé mi recuperación']};
+ $('#habits').innerHTML=hs.map(h=>`<label class="habit"><input type="checkbox" data-habit="${h}" ${x.hab[h]?'checked':''}><span><b>${labels[h][0]}</b><br><span class="muted">${labels[h][1]}</span></span></label>`).join('');
+ let done=hs.filter(h=>x.hab[h]).length,pct=Math.round(done/hs.length*100);$('#habitCount').textContent=`${done}/${hs.length}`;$('#pct').textContent=pct+'%';$('#dayBar').style.width=pct+'%';
+ $('#foodCount').textContent=x.foods.length?x.foods.length+' alimentos':'0 alimentos';
+ $('#foodList').innerHTML=x.foods.map((z,i)=>`<div class="item"><div><b>${z.n}</b><div class="muted">${z.k} kcal · ${z.p}g P · ${z.c}g C · ${z.f}g G</div></div><button class="btn secondary" data-food-del="${i}">×</button></div>`).join('')||'<p class="muted">Todavía no registraste alimentos.</p>';
+ $('#travelList').innerHTML=x.travelMeals.map((m,i)=>`<div class="item"><span>${m}</span><button class="btn secondary" data-travel-del="${i}">×</button></div>`).join('');
+ $('#exerciseList').innerHTML=x.ex.map((z,i)=>`<div class="item"><div><b>${z.t}</b><div class="muted">${z.detail||z.m+' min'}</div></div><button class="btn secondary" data-ex-del="${i}">×</button></div>`).join('')||'<p class="muted">Todavía no registraste ejercicio.</p>';
+ renderWeek(); save();
+}
+function renderWeek(){
+ const d=new Date(selected+'T12:00:00'); d.setDate(d.getDate()-((d.getDay()+6)%7));let total=0,done=0,html='';
+ for(let i=0;i<7;i++){let q=new Date(d);q.setDate(d.getDate()+i);let ds=q.toISOString().slice(0,10);if(ds<START||ds>END){html+='<div class="calday">—</div>';continue}let x=data[ds]||{hab:{}};let tr=ds>=TRIPSTART&&ds<=TRIPEND;let hs=tr?['movement','recovery']:['protein','movement','training','recovery'];let n=hs.filter(h=>x.hab?.[h]).length;total+=hs.length;done+=n;html+=`<button class="calday ${ds===selected?'selected':''} ${n===hs.length?'done':''}" data-day="${ds}"><div class="n">${q.getDate()}</div><div>${Math.round(n/hs.length*100)}%</div></button>`}
+ let pct=total?Math.round(done/total*100):0;$('#weekPct').textContent=pct+'%';$('#weekBar').style.width=pct+'%';$('#weekText').textContent=phase()==='trip'?'Semana de viaje: movimiento y recuperación.':'Semana normal: nutrición, movimiento, entrenamiento y recuperación.';$('#weekDays').innerHTML=html;
+}
+foods.forEach((f,i)=>$('#foodSelect').insertAdjacentHTML('beforeend',`<option value="${i}">${f[0]} · ${f[1]} · ${f[2]} kcal</option>`));
+$('#foodSelect').addEventListener('change',e=>{let f=foods[+e.target.value];if(f){$('#fk').value=f[2];$('#fp').value=f[3];$('#fc').value=f[4];$('#ff').value=f[5]}});
+$('#addFood').addEventListener('click',()=>{let i=+$('#foodSelect').value;if(!foods[i])return;let x=day();x.foods.push({n:foods[i][0],k:+$('#fk').value||0,p:+$('#fp').value||0,c:+$('#fc').value||0,f:+$('#ff').value||0});$('#foodSelect').value='';render()});
+$('#addTravel').addEventListener('click',()=>{let v=$('#travelMeal').value.trim();if(!v)return;day().travelMeals.push(v);$('#travelMeal').value='';render()});
+$('#steps').addEventListener('input',e=>{day().steps=Math.max(0,+e.target.value||0);render()});
+$('#weight').addEventListener('input',e=>{day().weight=e.target.value;save()});
+$('#period').addEventListener('change',e=>{day().period=e.target.checked;if(e.target.checked)day().hab.recovery=true;render()});
+$('#etype').addEventListener('change',()=>{$('#runFields').style.display=$('#etype').value==='run'?'grid':'none';$('#genericMinutes').style.display=$('#etype').value==='run'?'none':'block'});
+$('#addExercise').addEventListener('click',()=>{
+ let x=day(),t=$('#etype').value, name={run:'🏃 Running',lower:'🦵 Tren inferior',upper:'💪 Tren superior',incline:'🚶 Caminata inclinada',mobility:'🧘 Movilidad / recuperación'}[t];
+ if(t==='run'){let km=+$('#runKm').value||0,m=+$('#runMin').value||0;if(km<=0||m<=0)return;let pace=m/km;let mm=Math.floor(pace),ss=Math.round((pace-mm)*60);if(ss===60){mm++;ss=0}x.ex.push({t:name,m:Math.round(m),detail:`${km.toFixed(1)} km · ${m} min · ritmo ${mm}:${String(ss).padStart(2,'0')} min/km`})}
+ else{x.ex.push({t:name,m:Math.max(1,+$('#genericMin').value||0)})}render();
+});
+routinesInit();
+function routinesInit(){$('#runFields').style.display='grid';$('#genericMinutes').style.display='none'}
+$('#date').addEventListener('change',e=>{selected=clamp(e.target.value);render()});$('#prev').addEventListener('click',()=>{selected=clamp(addDays(selected,-1));render()});$('#next').addEventListener('click',()=>{selected=clamp(addDays(selected,1));render()});
+$$('.tab').forEach(b=>b.addEventListener('click',()=>{$$('.tab').forEach(q=>q.classList.remove('active'));b.classList.add('active');$$('.panel').forEach(q=>q.classList.remove('active'));$('#'+b.dataset.panel).classList.add('active')}));
+document.addEventListener('change',e=>{let h=e.target.closest('[data-habit]');if(h){day().hab[h.dataset.habit]=h.checked;render()}});
+document.addEventListener('click',e=>{
+ let f=e.target.closest('[data-food-del]');if(f){day().foods.splice(+f.dataset.foodDel,1);render()}
+ let z=e.target.closest('[data-ex-del]');if(z){day().ex.splice(+z.dataset.exDel,1);render()}
+ let t=e.target.closest('[data-travel-del]');if(t){day().travelMeals.splice(+t.dataset.travelDel,1);render()}
+ let c=e.target.closest('[data-day]');if(c){selected=c.dataset.day;render();$('.tab[data-panel="home"]').click()}
+});
+$('#clear').addEventListener('click',()=>{if(confirm('¿Borrar todos los datos guardados en este dispositivo?')){data={};save();render()}});
+render();
+</script>
+</body>
+</html>
