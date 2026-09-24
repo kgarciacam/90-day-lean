@@ -142,12 +142,29 @@
 <script>
 const START='2026-09-24',TRIPSTART='2026-10-24',TRIPEND='2026-11-15',END='2026-12-22';
 const foods=[
-['Manzana','1 mediana',95,.5,25,.3],['Papaya','1 taza',55,.9,14,.2],['Frutos secos','28 g',170,5,7,15],
-['Granuts de arándanos','30 g',150,1,24,5],['Soda Field','32 g',129,3,22,4],['Soda San Jorge','40 g',175,3,30,5],
-['Hey Fit','1 porción · estimado',100,3,14,4],['Chai latte de soya Starbucks','1 pequeño · estimado',160,5,30,2.5],
-['Queso Edam','20 g',70,5,.3,5.5],['Manzana Israel','1 mediana',80,.4,21,.2],['Rapidita','1 unidad · aprox. 40 g',120,3,22,2],['Plátano de seda','1 mediano',90,1.1,23,.3],
-['Tilapia a la plancha','100 g',130,26,0,2.5],['Popcorn Cineplanet','1 porción · estimado',500,8,55,28],
-['Makis langostino empanizado + palta','8 piezas · estimado',450,18,48,20]
+['Frutas','Manzana','1 mediana',95,.5,25,.3],
+['Frutas','Papaya','1 taza',55,.9,14,.2],
+['Frutas','Manzana Israel','1 mediana',80,.4,21,.2],
+['Frutas','Plátano de seda','1 mediano',90,1.1,23,.3],
+['Frutas','Fresas','1 taza (150 g)',48,1,12,.5],
+['Frutas','Arándanos','1 taza (145 g)',84,1.1,21,.5],
+['Frutos secos y snacks','Frutos secos','28 g',170,5,7,15],
+['Frutos secos y snacks','Granuts de arándanos','30 g',150,1,24,5],
+['Frutos secos y snacks','Soda Field','32 g',129,3,22,4],
+['Frutos secos y snacks','Soda San Jorge','40 g',175,3,30,5],
+['Frutos secos y snacks','Popcorn Cineplanet','1 porción · estimado',500,8,55,28],
+['Frutos secos y snacks','Makis langostino empanizado + palta','8 piezas · estimado',450,18,48,20],
+['Proteínas','Huevo duro','1 unidad',78,6.3,.6,5.3],
+['Proteínas','Huevo duro','2 unidades',156,12.6,1.2,10.6],
+['Proteínas','Tilapia a la plancha','100 g',130,26,0,2.5],
+['Proteínas','Pechuga de pollo a la plancha','100 g',165,31,0,3.6],
+['Lácteos','Yogurt griego Gloria','3 cucharadas (aprox. 60 g)',55,5.5,3.5,2],
+['Lácteos','Queso Edam','20 g',70,5,.3,5.5],
+['Verduras','Lechuga crespa','2 tazas (aprox. 80 g)',12,1,2,.1],
+['Panificados y tortillas','Rapidita Bimbo regular','1 unidad · aprox. 28 g',80,2,13,2],
+['Panificados y tortillas','Rapidita Bimbo Cero Cero','1 unidad · aprox. 28 g',70,2,13,1],
+['Bebidas','Hey Fit','1 porción · estimado',100,3,14,4],
+['Bebidas','Chai latte de soya Starbucks','1 pequeño · estimado',160,5,30,2.5]
 ];
 let selected=START;
 let data=JSON.parse(localStorage.getItem('90daylean-data')||'{}');
@@ -182,9 +199,15 @@ function renderWeek(){
  for(let i=0;i<7;i++){let q=new Date(d);q.setDate(d.getDate()+i);let ds=q.toISOString().slice(0,10);if(ds<START||ds>END){html+='<div class="calday">—</div>';continue}let x=data[ds]||{hab:{}};let tr=ds>=TRIPSTART&&ds<=TRIPEND;let hs=tr?['movement','recovery']:['protein','movement','training','recovery'];let n=hs.filter(h=>x.hab?.[h]).length;total+=hs.length;done+=n;html+=`<button class="calday ${ds===selected?'selected':''} ${n===hs.length?'done':''}" data-day="${ds}"><div class="n">${q.getDate()}</div><div>${Math.round(n/hs.length*100)}%</div></button>`}
  let pct=total?Math.round(done/total*100):0;$('#weekPct').textContent=pct+'%';$('#weekBar').style.width=pct+'%';$('#weekText').textContent=phase()==='trip'?'Semana de viaje: movimiento y recuperación.':'Semana normal: nutrición, movimiento, entrenamiento y recuperación.';$('#weekDays').innerHTML=html;
 }
-foods.forEach((f,i)=>$('#foodSelect').insertAdjacentHTML('beforeend',`<option value="${i}">${f[0]} · ${f[1]} · ${f[2]} kcal</option>`));
-$('#foodSelect').addEventListener('change',e=>{let f=foods[+e.target.value];if(f){$('#fk').value=f[2];$('#fp').value=f[3];$('#fc').value=f[4];$('#ff').value=f[5]}});
-$('#addFood').addEventListener('click',()=>{let i=+$('#foodSelect').value;if(!foods[i])return;let x=day();x.foods.push({n:foods[i][0],k:+$('#fk').value||0,p:+$('#fp').value||0,c:+$('#fc').value||0,f:+$('#ff').value||0});$('#foodSelect').value='';render()});
+const groups={};
+foods.forEach((f,i)=>{if(!groups[f[0]])groups[f[0]]=[];groups[f[0]].push({f,i})});
+Object.entries(groups).forEach(([cat,items])=>{
+  let og=document.createElement('optgroup'); og.label=cat;
+  items.forEach(({f,i})=>{let o=document.createElement('option');o.value=i;o.textContent=`${f[1]} · ${f[2]}`;og.appendChild(o)});
+  $('#foodSelect').appendChild(og);
+});
+$('#foodSelect').addEventListener('change',e=>{let f=foods[+e.target.value];if(f){$('#fk').value=f[3];$('#fp').value=f[4];$('#fc').value=f[5];$('#ff').value=f[6]}});
+$('#addFood').addEventListener('click',()=>{let i=+$('#foodSelect').value;if(!foods[i])return;let x=day();x.foods.push({n:foods[i][1]+' · '+foods[i][2],k:+$('#fk').value||0,p:+$('#fp').value||0,c:+$('#fc').value||0,f:+$('#ff').value||0});$('#foodSelect').value='';render()});
 $('#addManual').addEventListener('click',()=>{
   let n=$('#manualName').value.trim(),k=+$('#manualK').value||0,p=+$('#manualP').value||0,c=+$('#manualC').value||0,f=+$('#manualF').value||0;
   if(!n || k<=0)return;
