@@ -2,22 +2,22 @@
   "name": "90 Day Lean",
   "short_name": "90 Day Lean",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f7f3ff",
   "theme_color": "#b99cff",
-  "description": "Seguimiento personal de comidas, macros, ejercicio, pasos y progreso.",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
