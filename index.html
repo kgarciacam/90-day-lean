@@ -113,7 +113,7 @@
     <div class="two" style="margin-top:10px"><label>Pasos del día<input id="steps" type="number" min="0" max="50000"></label><div class="notice"><b id="moveGoal">7,000–10,000 pasos</b><br><span id="moveNote" class="muted">incluye corrida + caminata inclinada</span></div></div>
     <div id="exerciseForm" style="margin-top:12px">
       <h3 style="font-size:15px">Registrar ejercicio</h3>
-      <select id="etype"><option value="run">🏃 Running</option><option value="lower">🦵 Tren inferior</option><option value="upper">💪 Tren superior</option><option value="incline">🚶 Caminata inclinada</option><option value="mobility">🧘 Movilidad / recuperación</option></select>
+      <select id="etype"><option value="run">🏃 Running</option><option value="lower">🦵 Tren inferior</option><option value="upper">💪 Tren superior</option><option value="full">🏋️ Full body</option><option value="incline">🚶 Caminata inclinada</option><option value="mobility">🧘 Movilidad / recuperación</option></select>
       <div id="runFields" class="two"><label>Distancia (km)<input id="runKm" type="number" min="0" step=".1" placeholder="Ej. 3.5"></label><label>Tiempo (min)<input id="runMin" type="number" min="0" step=".1" placeholder="Ej. 24"></label></div>
       <div id="genericMinutes"><label>Tiempo (min)<input id="genericMin" type="number" min="1" step="1" value="30"></label></div>
       <button class="btn" id="addExercise" style="margin-top:8px">+ Registrar ejercicio</button>
@@ -125,6 +125,7 @@
     <div class="grid" style="margin-top:10px">
       <div class="routine"><b>🦵 Tren inferior</b><ul><li>Prensa/sentadilla · 3×8–12</li><li>Peso muerto rumano · 3×8–12</li><li>Hip thrust · 3×8–12</li><li>Curl femoral · 3×10–15</li><li>Extensión de cuádriceps · 2×10–15</li><li>Caminata inclinada · 15–20 min</li></ul></div>
       <div class="routine"><b>💪 Tren superior</b><ul><li>Jalón al pecho · 3×8–12</li><li>Remo sentado · 3×8–12</li><li>Press de pecho · 3×8–12</li><li>Press de hombros · 2–3×8–12</li><li>Elevaciones laterales · 2–3×12–15</li><li>Curl de bíceps · 2×10–15</li><li>Tríceps en polea · 2×10–15</li><li><b>Extensiones de espalda · 2×10–15</b></li><li><b>Core · 2–3 series</b></li><li>Caminata inclinada · 20–30 min</li></ul></div>
+      <div class="routine"><b>🏋️ Día 3 · Full body (énfasis glúteos y estabilidad)</b><ul><li>Sentadilla goblet o prensa · 3×8–12</li><li>Hip thrust · 3×10–12</li><li>Remo con polea o mancuerna · 2×10–12</li><li>Press de pecho con mancuernas · 2×8–12</li><li>Peso muerto rumano ligero · 2×10–12</li><li>Abducción de cadera · 2×12–15</li><li>Core · 2 series</li><li>Caminata inclinada suave · 10–15 min opcional</li></ul></div>
     </div>
   </div>
   <div class="card"><h3>Ejercicio registrado</h3><div id="exerciseList" class="grid" style="margin-top:10px"></div></div>
@@ -136,9 +137,7 @@
 
 <section id="plan" class="panel">
   <div class="card"><h3>Tu calendario de 90 días</h3><div class="grid" style="margin-top:10px">
-    <div class="notice"><b>🇵🇪 29 sep – 23 oct</b><br><span class="muted">1,650 kcal · 120 g proteína · 2 gym · running · 7–10K pasos</span></div>
-    <div class="notice"><b>🇪🇺 24 oct – 15 nov</b><br><span class="muted">≥10K pasos · alimentación razonable · disfrutar · sin gym obligatorio</span></div>
-    <div class="notice"><b>🇵🇪 16 nov – 27 dic</b><br><span class="muted">Retomamos el plan normal sin compensar el viaje</span></div>
+    <div class="notice"><b>🇵🇪 23 nov 2026 – 20 feb 2027</b><br><span class="muted">1,650 kcal como punto de partida · 120 g proteína · 3 días de gym (inferior, superior y full body) · running flexible · caminata inclinada · 7–10K pasos</span></div>
   </div></div>
   <div class="card"><h3>Regla de calorías</h3><p class="muted" style="margin-top:7px">1,650 kcal es el punto de partida y no baja automáticamente. Se revisa tras varias semanas según tendencia de peso, hambre, energía y rendimiento.</p></div>
   <div class="card"><button class="btn danger" id="clear">Borrar todos mis datos</button><p class="muted" style="margin-top:7px">Solo úsalo si quieres reiniciar completamente la app en este dispositivo.</p></div>
@@ -146,7 +145,7 @@
 </main>
 </div>
 <script>
-const START='2026-09-29',TRIPSTART='2026-10-24',TRIPEND='2026-11-15',END='2026-12-27';
+const START='2026-11-23',TRIPSTART='2027-02-21',TRIPEND='2027-02-22',END='2027-02-20';
 const foods=[
 ['Frutas','Manzana','1 mediana',95,.5,25,.3],
 ['Frutas','Papaya','1 taza',55,.9,14,.2],
@@ -171,14 +170,15 @@ const foods=[
 ['Bebidas','Hey Fit','1 porción · estimado',100,3,14,4],
 ['Bebidas','Chai latte de soya Starbucks','1 pequeño · estimado',160,5,30,2.5]
 ];
-let selected=new Date().toISOString().slice(0,10);
+const localToday=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+let selected=localToday();
 if(selected<START) selected=START; if(selected>END) selected=END;
-const STORAGE_KEY='90daylean-data-v5';
+const STORAGE_KEY='90daylean-data-v6';
 let data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 function day(){if(!data[selected])data[selected]={foods:[],ex:[],steps:0,weight:'',period:false,hab:{protein:false,movement:false,training:false,recovery:false},travelMeals:[]};return data[selected]}
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}
-function phase(){return selected>=TRIPSTART&&selected<=TRIPEND?'trip':'normal'}
+function phase(){return 'normal'}
 function fmt(s){return new Intl.DateTimeFormat('es-PE',{day:'numeric',month:'short',year:'numeric'}).format(new Date(s+'T12:00:00'))}
 function dayDiff(a,b){return Math.round((new Date(a+'T12:00:00')-new Date(b+'T12:00:00'))/86400000)}
 function clamp(s){return s<START?START:s>END?END:s}
@@ -189,7 +189,7 @@ function render(){
  $('#kcal').textContent=Math.round(k);$('#protein').textContent=Math.round(pr);$('#stepsTop').textContent=x.steps.toLocaleString('en-US');$('#minutes').textContent=mins;
  $('#kcalGoal').textContent=p==='trip'?'':'/ 1650';$('#proteinGoal').textContent=p==='trip'?'':'/ 120 g';$('#stepsGoal').textContent=p==='trip'?'/ 10K+':'/ 7K+';
  $('#date').value=selected;$('#weight').value=x.weight;$('#period').checked=x.period;$('#steps').value=x.steps;
- $('#notice').innerHTML=p==='trip'?'<b>🇪🇺 Estás de viaje.</b> Prioridad: caminar, comer razonablemente, hidratarte y disfrutar. No necesitas contar calorías ni hacer gym.':'<b>🇵🇪 Plan normal.</b> Objetivo: 1,650 kcal · 120 g proteína · 7–10K pasos totales.';
+ $('#notice').innerHTML=p==='trip'?'<b>🇪🇺 Estás de viaje.</b> Prioridad: caminar, comer razonablemente, hidratarte y disfrutar. No necesitas contar calorías ni hacer gym.':'<b>🇵🇪 Plan normal.</b> Objetivo: 1,650 kcal · 120 g proteína · 3 días de gym (inferior, superior y full body) · 7–10K pasos totales.';
  $('#normalFood').classList.toggle('hide',p==='trip');$('#tripFood').classList.toggle('hide',p!=='trip');$('#exerciseForm').classList.toggle('hide',p==='trip');$('#tripMovement').classList.toggle('hide',p!=='trip');$('#routines').classList.toggle('hide',p==='trip');
  $('#moveGoal').textContent=p==='trip'?'10,000+ pasos':'7,000–10,000 pasos';$('#moveNote').textContent=p==='trip'?'principal actividad del viaje':'incluye corrida + caminata inclinada';
  let hs=p==='trip'?['movement','recovery']:['protein','movement','training','recovery'];let labels={protein:['Proteína','Llegué cerca de 120 g'],movement:['Movimiento','Cumplí mi objetivo de pasos'],training:['Entrenamiento','Hice lo que correspondía'],recovery:['Recuperación','Cuidé mi recuperación']};
@@ -203,8 +203,8 @@ function render(){
 }
 function renderWeek(){
  const d=new Date(selected+'T12:00:00'); d.setDate(d.getDate()-((d.getDay()+6)%7));let total=0,done=0,html='';
- for(let i=0;i<7;i++){let q=new Date(d);q.setDate(d.getDate()+i);let ds=q.toISOString().slice(0,10);if(ds<START||ds>END){html+='<div class="calday">—</div>';continue}let x=data[ds]||{hab:{}};let tr=ds>=TRIPSTART&&ds<=TRIPEND;let hs=tr?['movement','recovery']:['protein','movement','training','recovery'];let n=hs.filter(h=>x.hab?.[h]).length;total+=hs.length;done+=n;html+=`<button class="calday ${ds===selected?'selected':''} ${n===hs.length?'done':''}" data-day="${ds}"><div class="n">${q.getDate()}</div><div>${Math.round(n/hs.length*100)}%</div></button>`}
- let pct=total?Math.round(done/total*100):0;$('#weekPct').textContent=pct+'%';$('#weekBar').style.width=pct+'%';$('#weekText').textContent=phase()==='trip'?'Semana de viaje: movimiento y recuperación.':'Semana normal: nutrición, movimiento, entrenamiento y recuperación.';$('#weekDays').innerHTML=html;
+ for(let i=0;i<7;i++){let q=new Date(d);q.setDate(d.getDate()+i);let ds=q.toISOString().slice(0,10);if(ds<START||ds>END){html+='<div class="calday">—</div>';continue}let x=data[ds]||{hab:{}};let tr=false;let hs=['protein','movement','training','recovery'];let n=hs.filter(h=>x.hab?.[h]).length;total+=hs.length;done+=n;html+=`<button class="calday ${ds===selected?'selected':''} ${n===hs.length?'done':''}" data-day="${ds}"><div class="n">${q.getDate()}</div><div>${Math.round(n/hs.length*100)}%</div></button>`}
+ let pct=total?Math.round(done/total*100):0;$('#weekPct').textContent=pct+'%';$('#weekBar').style.width=pct+'%';$('#weekText').textContent=phase()==='trip'?'Semana de progreso: nutrición, movimiento, entrenamiento y recuperación.':'Semana normal: nutrición, movimiento, entrenamiento y recuperación.';$('#weekDays').innerHTML=html;
 }
 const groups={};
 foods.forEach((f,i)=>{if(!groups[f[0]])groups[f[0]]=[];groups[f[0]].push({f,i})});
@@ -239,7 +239,7 @@ $('#weight').addEventListener('input',e=>{day().weight=e.target.value;save()});
 $('#period').addEventListener('change',e=>{day().period=e.target.checked;if(e.target.checked)day().hab.recovery=true;render()});
 $('#etype').addEventListener('change',()=>{$('#runFields').style.display=$('#etype').value==='run'?'grid':'none';$('#genericMinutes').style.display=$('#etype').value==='run'?'none':'block'});
 $('#addExercise').addEventListener('click',()=>{
- let x=day(),t=$('#etype').value, name={run:'🏃 Running',lower:'🦵 Tren inferior',upper:'💪 Tren superior',incline:'🚶 Caminata inclinada',mobility:'🧘 Movilidad / recuperación'}[t];
+ let x=day(),t=$('#etype').value, name={run:'🏃 Running',lower:'🦵 Tren inferior',upper:'💪 Tren superior',full:'🏋️ Full body',incline:'🚶 Caminata inclinada',mobility:'🧘 Movilidad / recuperación'}[t];
  if(t==='run'){let km=+$('#runKm').value||0,m=+$('#runMin').value||0;if(km<=0||m<=0)return;let pace=m/km;let mm=Math.floor(pace),ss=Math.round((pace-mm)*60);if(ss===60){mm++;ss=0}x.ex.push({t:name,m:Math.round(m),detail:`${km.toFixed(1)} km · ${m} min · ritmo ${mm}:${String(ss).padStart(2,'0')} min/km`})}
  else{x.ex.push({t:name,m:Math.max(1,+$('#genericMin').value||0)})}render();
 });
